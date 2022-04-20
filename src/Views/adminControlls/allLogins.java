@@ -1,0 +1,359 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package Views.adminControlls;
+
+import Models.Session;
+import Controllers.sessionController;
+import Controllers.systemController;
+import Controllers.ticketController;
+import Models.Messages;
+import Views.commondialogs.printerService;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import javax.swing.table.DefaultTableModel;
+
+/**
+ *
+ * @author ARTEMISA
+ */
+public class allLogins extends javax.swing.JFrame {
+
+    /**
+     * Creates new form allLogins
+     */
+    String Class = "allLogins";
+    DefaultTableModel modelo;
+    Date Now = new Date();
+    sessionController DataBase = sessionController.getInstance();
+    List<Session> filtredData;
+
+    public allLogins() {
+        initComponents();
+        btnClose.requestFocus();
+    }
+
+    public void loadFrame() {
+//        this.setExtendedState(this.MAXIMIZED_BOTH);
+        this.setTitle("Actividad Reciente");
+        this.setIconImage(systemController.getInstance().getImageIcon().getImage());
+        this.setLocationRelativeTo(sessionController.getInstance().getShowedFrame());
+        loadTable();
+        setNowDate();
+        btnClose.requestFocus();
+    }
+
+    public void setNowDate() {
+        dateFrom.setDate(Now);
+        dateTo.setDate(Now);
+    }
+
+    public void aplyFilters() {
+        if ((dateFrom.getDate() != null) && (dateTo.getDate() != null)) {
+            if (dateFrom.getDate().equals(dateTo.getDate())) {
+                Now.setHours(0);
+                Now.setMinutes(0);
+                Now.setSeconds(0);
+                dateFrom.setDate(Now);
+                Now.setHours(23);
+                Now.setMinutes(59);
+                Now.setSeconds(59);
+                dateTo.setDate(Now);
+            }
+            List<Session> allRegs = DataBase.getDataBase();
+            filtredData = new ArrayList<>();
+            Date From = dateFrom.getDate();
+            Date To = dateTo.getDate();
+            for (int i = 0; i < allRegs.size(); i++) {
+                Session temp = allRegs.get(i);
+                if (((temp.getFirstLogin().after(From)) && (temp.getLastLogin().before(To))) || ((temp.getFirstLogin().equals(From)) && (temp.getLastLogin().equals(To)))) {
+                    filtredData.add(temp);
+                }
+            }
+            showDatabase();
+        }
+    }
+
+//    public void aplyFilters() {
+//        if ((dateFrom.getDate() != null) && (dateTo.getDate() != null)) {
+//            List<Session> allRegs = DataBase.findRegbyDateRange(dateFrom.getDate(), dateTo.getDate());
+//            filtredData = new ArrayList<>();
+//            for (int i = 0; i < filtredData.size(); i++) {                
+//                filtredData.add(allRegs.get(i));
+//            }
+//            showDatabase();
+//        }
+//    }
+    public void showDatabase() {
+        try {
+            modelo.setRowCount(0);
+            for (int i = 0; i < DataBase.getDataBase().size(); i++) {
+                Session temp = DataBase.getDataBase().get(i);
+                Date From = dateFrom.getDate();
+                Date To = dateTo.getDate();
+                if (((temp.getFirstLogin().after(From)) && (temp.getFirstLogin().before(To))) || ((temp.getFirstLogin().equals(From)) && (temp.getFirstLogin().equals(To)))) {
+                    String[] fila = {temp.getId() + "",
+                        temp.getUsername(),
+                        temp.getFirstLoginToString(),
+                        temp.getTimeFirstLogin(),
+                        temp.getLastLoginToString(),
+                        temp.getTimeLastLogin(),
+                        temp.getNumberLoggins() + ""};
+                    modelo.addRow(fila);
+                }
+
+            }
+        } catch (Exception e) {
+            new Messages().errorMessage(Class, "showDatabase()", e);
+        }
+    }
+
+    public void loadTable() {
+        modelo = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int filas, int columnas) {
+                if (columnas < 0) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        };
+        modelo.addColumn("Codigo");
+        modelo.addColumn("Cuenta de Usuario");
+        modelo.addColumn("Primer Login");
+        modelo.addColumn("Hora de Primer Login");
+        modelo.addColumn("Ultimo Login");
+        modelo.addColumn("Hora de Ultimo Login");
+        modelo.addColumn("n. Logueos");
+        tableData.setModel(modelo);
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tableData = new javax.swing.JTable();
+        btnClose = new javax.swing.JButton();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        dateFrom = new com.toedter.calendar.JDateChooser();
+        jLabel4 = new javax.swing.JLabel();
+        dateTo = new com.toedter.calendar.JDateChooser();
+        btnPrint = new javax.swing.JButton();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+
+        tableData.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+
+            }
+        ));
+        tableData.setRowHeight(30);
+        jScrollPane1.setViewportView(tableData);
+
+        btnClose.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        btnClose.setText("Cerrar");
+        btnClose.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCloseActionPerformed(evt);
+            }
+        });
+
+        jLabel5.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jLabel5.setText("A");
+
+        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jLabel2.setText("Actividad Reciente");
+
+        dateFrom.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        dateFrom.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                dateFromPropertyChange(evt);
+            }
+        });
+
+        jLabel4.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jLabel4.setText("DE");
+
+        dateTo.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        dateTo.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                dateToPropertyChange(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 54, Short.MAX_VALUE)
+                .addComponent(jLabel4)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(dateFrom, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(dateTo, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(dateFrom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(dateTo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+
+        btnPrint.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        btnPrint.setText("Imprimir Reporte");
+        btnPrint.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPrintActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 676, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(btnPrint)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnClose)))
+                .addContainerGap())
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 301, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnClose)
+                    .addComponent(btnPrint))
+                .addContainerGap())
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void dateFromPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_dateFromPropertyChange
+        aplyFilters();
+    }//GEN-LAST:event_dateFromPropertyChange
+
+
+    private void dateToPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_dateToPropertyChange
+        aplyFilters();
+    }//GEN-LAST:event_dateToPropertyChange
+
+    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
+        this.dispose();
+    }//GEN-LAST:event_btnCloseActionPerformed
+
+    private void btnPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed
+        printDocument();
+    }//GEN-LAST:event_btnPrintActionPerformed
+
+    public void printDocument() {
+        if (dateFrom.getDate() != null && dateFrom.getDate() != null) {
+            if (new Messages().yesNoMessage("Imprimir Reporte", "Desea Imprimir Reporte?")) {
+                printerService selectPrinter = new printerService(sessionController.getInstance().getMainFrame(), true);
+                selectPrinter.setData();
+                selectPrinter.show();
+                if (selectPrinter.isNext()) {
+                    String SelectedPrinter = selectPrinter.getSelectedPrinter();
+                    if (new ticketController().printLogginsReport(dateFrom.getDate(), dateTo.getDate(), filtredData, SelectedPrinter)) {
+                        String text = "<html>"
+                                + "<center>"
+                                + "<b>"
+                                + "¡REPORTE IMPRESO CORRECTAMENTE!"
+                                + "</b>"
+                                + "<br>"
+                                + "<br>"
+                                + "Clic para cerrar…"
+                                + "</center>"
+                                + "</html>";
+                        new Messages().aceptMessage("Imprimir Documento", text);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(allLogins.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(allLogins.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(allLogins.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(allLogins.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new allLogins().setVisible(true);
+            }
+        });
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnClose;
+    private javax.swing.JButton btnPrint;
+    private com.toedter.calendar.JDateChooser dateFrom;
+    private com.toedter.calendar.JDateChooser dateTo;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable tableData;
+    // End of variables declaration//GEN-END:variables
+}
